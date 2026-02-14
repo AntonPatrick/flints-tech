@@ -1,1 +1,2 @@
 # flints-tech
+Static pages
