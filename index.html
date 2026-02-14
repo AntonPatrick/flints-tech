@@ -8,805 +8,170 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
-
   <style>
-    /* ─── RESET & BASE ─────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:         #0a0a0b;
-      --bg2:        #111114;
-      --bg3:        #17171c;
-      --border:     rgba(255,255,255,0.07);
-      --border-lit: rgba(255,255,255,0.15);
-      --text:       #e8e8ea;
-      --muted:      #666675;
-      --muted2:     #999aaa;
-      --accent:     #c8ff57;
-      --accent2:    #57c8ff;
-      --red:        #ff5757;
-      --font-mono:  'DM Mono', monospace;
+      --bg: #0a0a0b; --bg2: #111114; --bg3: #17171c;
+      --border: rgba(255,255,255,0.07); --border-lit: rgba(255,255,255,0.15);
+      --text: #e8e8ea; --muted: #666675; --muted2: #999aaa;
+      --accent: #c8ff57; --accent2: #57c8ff; --red: #ff5757;
+      --font-mono: 'DM Mono', monospace;
       --font-serif: 'Instrument Serif', serif;
-      --font-sans:  'Syne', sans-serif;
-      --max:        1200px;
-      --radius:     4px;
+      --font-sans: 'Syne', sans-serif;
+      --max: 1200px; --radius: 4px;
     }
-
     html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-sans);
-      font-size: 16px;
-      line-height: 1.6;
-      overflow-x: hidden;
-      cursor: none;
-    }
-
-    /* ─── CUSTOM CURSOR ─────────────────────────────────────────────── */
-    .cursor {
-      position: fixed;
-      width: 8px; height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
-      mix-blend-mode: difference;
-    }
-    .cursor-ring {
-      position: fixed;
-      width: 36px; height: 36px;
-      border: 1px solid rgba(200, 255, 87, 0.4);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: transform 0.18s ease, width 0.3s, height 0.3s, border-color 0.3s;
-    }
-    body:has(a:hover) .cursor-ring,
-    body:has(button:hover) .cursor-ring { width: 56px; height: 56px; border-color: rgba(200,255,87,0.7); }
-
-    /* ─── NOISE OVERLAY ─────────────────────────────────────────────── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      background-repeat: repeat;
-      background-size: 200px;
-      opacity: 0.35;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* ─── SCROLLBAR ─────────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 3px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
-
-    /* ─── UTILITY ────────────────────────────────────────────────────── */
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 16px; line-height: 1.6; overflow-x: hidden; cursor: none; }
+    .cursor { position: fixed; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); mix-blend-mode: difference; }
+    .cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(200,255,87,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: width .3s, height .3s, border-color .3s; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 200px; opacity: .35; pointer-events: none; z-index: 1; }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
     .container { max-width: var(--max); margin: 0 auto; padding: 0 40px; }
-    .tag {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      border: 1px solid rgba(200,255,87,0.25);
-      padding: 4px 10px;
-      border-radius: var(--radius);
-    }
+    .tag { display: inline-block; font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(200,255,87,.25); padding: 4px 10px; border-radius: var(--radius); }
 
-    /* ─── NAV ────────────────────────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.4s, background 0.4s, backdrop-filter 0.4s;
-    }
-    nav.scrolled {
-      background: rgba(10,10,11,0.85);
-      backdrop-filter: blur(20px);
-      border-color: var(--border);
-    }
-    .nav-inner {
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 0 40px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .nav-logo {
-      font-family: var(--font-mono);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text);
-      text-decoration: none;
-      letter-spacing: 0.05em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .nav-logo-mark {
-      width: 24px; height: 24px;
-      border: 1.5px solid var(--accent);
-      border-radius: 3px;
-      display: grid;
-      place-items: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .nav-logo-mark::before {
-      content: '';
-      position: absolute;
-      width: 10px; height: 1.5px;
-      background: var(--accent);
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) rotate(-45deg);
-      box-shadow: 0 4px 0 var(--accent), 0 -4px 0 var(--accent);
-    }
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; border-bottom: 1px solid transparent; transition: border-color .4s, background .4s, backdrop-filter .4s; }
+    nav.scrolled { background: rgba(10,10,11,.85); backdrop-filter: blur(20px); border-color: var(--border); }
+    .nav-inner { max-width: var(--max); margin: 0 auto; padding: 0 40px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--text); text-decoration: none; letter-spacing: .05em; display: flex; align-items: center; gap: 10px; }
+    .nav-logo-mark { width: 24px; height: 24px; border: 1.5px solid var(--accent); border-radius: 3px; display: grid; place-items: center; position: relative; overflow: hidden; }
+    .nav-logo-mark::before { content: ''; position: absolute; width: 10px; height: 1.5px; background: var(--accent); top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-45deg); box-shadow: 0 4px 0 var(--accent), 0 -4px 0 var(--accent); }
     .nav-links { display: flex; gap: 36px; list-style: none; }
-    .nav-links a {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted2);
-      text-decoration: none;
-      transition: color 0.2s;
-      position: relative;
-    }
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -2px; left: 0; right: 0;
-      height: 1px;
-      background: var(--accent);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.25s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a:hover::after { transform: scaleX(1); }
-
-    .nav-cta {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      border: 1px solid rgba(200,255,87,0.4);
-      padding: 8px 18px;
-      border-radius: var(--radius);
-      text-decoration: none;
-      transition: background 0.2s, color 0.2s;
-    }
+    .nav-links a { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted2); text-decoration: none; transition: color .2s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 1px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .25s; }
+    .nav-links a:hover { color: var(--text); } .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-cta { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(200,255,87,.4); padding: 8px 18px; border-radius: var(--radius); text-decoration: none; transition: background .2s, color .2s; }
     .nav-cta:hover { background: var(--accent); color: var(--bg); }
 
-    /* ─── HERO ───────────────────────────────────────────────────────── */
-    #hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 120px 0 80px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* grid lines background */
-    #hero::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 80px 80px;
-      background-position: center center;
-      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%);
-      pointer-events: none;
-    }
-
-    .hero-eyebrow {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 36px;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.2s forwards;
-    }
-    .hero-eyebrow-line {
-      width: 48px; height: 1px;
-      background: var(--accent);
-    }
-
-    .hero-headline {
-      font-size: clamp(52px, 8vw, 110px);
-      font-weight: 800;
-      line-height: 0.95;
-      letter-spacing: -0.03em;
-      max-width: 900px;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.35s forwards;
-    }
-    .hero-headline em {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-weight: 400;
-      color: var(--muted2);
-    }
-
-    .hero-sub {
-      margin-top: 40px;
-      max-width: 480px;
-      color: var(--muted2);
-      font-size: 15px;
-      line-height: 1.7;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.5s forwards;
-    }
-
-    .hero-actions {
-      margin-top: 52px;
-      display: flex;
-      align-items: center;
-      gap: 28px;
-      flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.65s forwards;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--accent);
-      color: var(--bg);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 14px 28px;
-      border-radius: var(--radius);
-      text-decoration: none;
-      transition: box-shadow 0.3s, transform 0.2s;
-    }
-    .btn-primary:hover {
-      box-shadow: 0 0 40px rgba(200,255,87,0.3);
-      transform: translateY(-1px);
-    }
-    .btn-primary svg { transition: transform 0.2s; }
-    .btn-primary:hover svg { transform: translateX(4px); }
-
-    .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted2);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
+    /* HERO */
+    #hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 120px 0 80px; position: relative; overflow: hidden; }
+    #hero::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size: 80px 80px; background-position: center; mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%); pointer-events: none; }
+    .hero-eyebrow { display: flex; align-items: center; gap: 16px; margin-bottom: 36px; opacity: 0; animation: fadeUp .8s .2s forwards; }
+    .hero-eyebrow-line { width: 48px; height: 1px; background: var(--accent); }
+    .hero-headline { font-size: clamp(52px, 8vw, 110px); font-weight: 800; line-height: .95; letter-spacing: -.03em; max-width: 900px; opacity: 0; animation: fadeUp .9s .35s forwards; }
+    .hero-headline em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--muted2); }
+    .hero-sub { margin-top: 40px; max-width: 480px; color: var(--muted2); font-size: 15px; line-height: 1.7; opacity: 0; animation: fadeUp .9s .5s forwards; }
+    .hero-actions { margin-top: 52px; display: flex; align-items: center; gap: 28px; flex-wrap: wrap; opacity: 0; animation: fadeUp .9s .65s forwards; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: var(--bg); font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; padding: 14px 28px; border-radius: var(--radius); text-decoration: none; transition: box-shadow .3s, transform .2s; }
+    .btn-primary:hover { box-shadow: 0 0 40px rgba(200,255,87,.3); transform: translateY(-1px); }
+    .btn-primary svg { transition: transform .2s; } .btn-primary:hover svg { transform: translateX(4px); }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; color: var(--muted2); font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; transition: color .2s; }
     .btn-ghost:hover { color: var(--text); }
-
-    .hero-stats {
-      margin-top: 100px;
-      display: grid;
-      grid-template-columns: repeat(3, auto);
-      gap: 0;
-      border-top: 1px solid var(--border);
-      max-width: 560px;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.8s forwards;
-    }
-    .hero-stat {
-      padding: 32px 40px 0 0;
-    }
-    .hero-stat + .hero-stat {
-      padding-left: 40px;
-      border-left: 1px solid var(--border);
-    }
-    .stat-num {
-      font-size: 36px;
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      color: var(--text);
-      line-height: 1;
-    }
+    .hero-stats { margin-top: 100px; display: grid; grid-template-columns: repeat(3,auto); border-top: 1px solid var(--border); max-width: 560px; opacity: 0; animation: fadeUp .9s .8s forwards; }
+    .hero-stat { padding: 32px 40px 0 0; }
+    .hero-stat + .hero-stat { padding-left: 40px; border-left: 1px solid var(--border); }
+    .stat-num { font-size: 36px; font-weight: 700; letter-spacing: -.04em; color: var(--text); line-height: 1; }
     .stat-num span { color: var(--accent); }
-    .stat-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    /* floating accent block */
-    .hero-accent-block {
-      position: absolute;
-      right: 80px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 320px;
-      opacity: 0;
-      animation: fadeUp 1s 0.9s forwards;
-    }
-    .accent-card {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
-    }
-    .accent-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    }
-    .accent-card-label {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
+    .stat-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+    .hero-accent-block { position: absolute; right: 80px; top: 50%; transform: translateY(-50%); width: 320px; opacity: 0; animation: fadeUp 1s .9s forwards; }
+    .accent-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 28px; position: relative; overflow: hidden; }
+    .accent-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+    .accent-card-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
     .accent-card-items { display: flex; flex-direction: column; gap: 10px; }
-    .aci {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--muted2);
-    }
-    .aci-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-      animation: pulse 2s infinite;
-    }
-    .aci-dot.blue { background: var(--accent2); }
-    .aci-dot.red { background: var(--red); animation-delay: 0.5s; }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
+    .aci { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 11px; color: var(--muted2); }
+    .aci-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; animation: pulse 2s infinite; }
+    .aci-dot.blue { background: var(--accent2); } .aci-dot.red { background: var(--red); animation-delay: .5s; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
 
-    /* ─── SECTION SHARED ─────────────────────────────────────────────── */
+    /* SHARED */
     section { position: relative; z-index: 2; }
-    .section-label {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
+    .section-label { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
     .section-label-line { width: 32px; height: 1px; background: var(--border-lit); }
-    .section-number {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-    }
+    .section-number { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; color: var(--muted); }
+    .section-heading { font-size: clamp(36px, 5vw, 64px); font-weight: 700; letter-spacing: -.03em; line-height: 1.05; }
+    .section-heading em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--muted2); }
 
-    .section-heading {
-      font-size: clamp(36px, 5vw, 64px);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.05;
-    }
-    .section-heading em {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-weight: 400;
-      color: var(--muted2);
-    }
-
-    /* ─── MARQUEE ─────────────────────────────────────────────────────── */
-    .marquee-wrap {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      overflow: hidden;
-      padding: 14px 0;
-      background: var(--bg2);
-    }
-    .marquee-track {
-      display: flex;
-      gap: 0;
-      width: max-content;
-      animation: marquee 28s linear infinite;
-    }
-    .marquee-item {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-      padding: 0 28px;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      white-space: nowrap;
-    }
+    /* MARQUEE */
+    .marquee-wrap { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; padding: 14px 0; background: var(--bg2); }
+    .marquee-track { display: flex; width: max-content; animation: marquee 28s linear infinite; }
+    .marquee-item { display: flex; align-items: center; gap: 28px; padding: 0 28px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
     .marquee-sep { color: var(--accent); font-size: 14px; }
-    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
-    /* ─── SERVICES ────────────────────────────────────────────────────── */
-    #services {
-      padding: 120px 0;
-      border-top: 1px solid var(--border);
-    }
-    .services-header {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: end;
-      margin-bottom: 80px;
-    }
-    .services-sub {
-      color: var(--muted2);
-      font-size: 15px;
-      line-height: 1.7;
-      max-width: 360px;
-    }
-
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .service-card {
-      background: var(--bg);
-      padding: 48px 44px;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.3s;
-    }
+    /* SERVICES */
+    #services { padding: 120px 0; border-top: 1px solid var(--border); }
+    .services-header { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; margin-bottom: 80px; }
+    .services-sub { color: var(--muted2); font-size: 15px; line-height: 1.7; max-width: 360px; }
+    .services-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .service-card { background: var(--bg); padding: 48px 44px; position: relative; overflow: hidden; transition: background .3s; }
     .service-card:hover { background: var(--bg2); }
-    .service-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(200,255,87,0.04) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
+    .service-card::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(200,255,87,.04) 0%, transparent 60%); opacity: 0; transition: opacity .3s; }
     .service-card:hover::after { opacity: 1; }
-
-    .service-num {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-bottom: 28px;
-    }
-    .service-icon {
-      width: 44px; height: 44px;
-      border: 1px solid var(--border-lit);
-      border-radius: 6px;
-      display: grid;
-      place-items: center;
-      margin-bottom: 28px;
-      transition: border-color 0.3s;
-    }
-    .service-card:hover .service-icon { border-color: rgba(200,255,87,0.4); }
+    .service-num { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; color: var(--muted); margin-bottom: 28px; }
+    .service-icon { width: 44px; height: 44px; border: 1px solid var(--border-lit); border-radius: 6px; display: grid; place-items: center; margin-bottom: 28px; transition: border-color .3s; }
+    .service-card:hover .service-icon { border-color: rgba(200,255,87,.4); }
     .service-icon svg { color: var(--accent); }
+    .service-title { font-size: 20px; font-weight: 600; letter-spacing: -.02em; margin-bottom: 16px; }
+    .service-desc { font-size: 14px; color: var(--muted2); line-height: 1.7; }
+    .service-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+    .service-tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 4px 8px; border-radius: 2px; }
 
-    .service-title {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-    }
-    .service-desc {
-      font-size: 14px;
-      color: var(--muted2);
-      line-height: 1.7;
-    }
-    .service-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 28px;
-    }
-    .service-tag {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      padding: 4px 8px;
-      border-radius: 2px;
-    }
-
-    /* ─── ABOUT ───────────────────────────────────────────────────────── */
-    #about {
-      padding: 120px 0;
-      border-top: 1px solid var(--border);
-    }
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 100px;
-      align-items: start;
-    }
+    /* ABOUT */
+    #about { padding: 120px 0; border-top: 1px solid var(--border); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start; }
     .about-left { position: sticky; top: 100px; }
-    .about-desc {
-      margin-top: 40px;
-      color: var(--muted2);
-      font-size: 15px;
-      line-height: 1.8;
-    }
+    .about-desc { margin-top: 40px; color: var(--muted2); font-size: 15px; line-height: 1.8; }
     .about-desc + .about-desc { margin-top: 20px; }
-
     .about-right { display: flex; flex-direction: column; gap: 2px; }
-    .about-feature {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 28px 32px;
-      transition: border-color 0.3s, background 0.3s;
-      cursor: default;
-    }
-    .about-feature:hover {
-      border-color: var(--border-lit);
-      background: var(--bg2);
-    }
-    .about-feature-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .about-feature-title {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-    .about-feature-icon {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: rgba(200,255,87,0.08);
-      display: grid;
-      place-items: center;
-    }
-    .about-feature-desc {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
+    .about-feature { border: 1px solid var(--border); border-radius: 6px; padding: 28px 32px; transition: border-color .3s, background .3s; cursor: default; }
+    .about-feature:hover { border-color: var(--border-lit); background: var(--bg2); }
+    .about-feature-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .about-feature-title { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+    .about-feature-icon { width: 28px; height: 28px; border-radius: 50%; background: rgba(200,255,87,.08); display: grid; place-items: center; }
+    .about-feature-desc { font-family: var(--font-mono); font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .about-entity { margin-top: 52px; padding: 28px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; }
+    .about-entity-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .about-entity-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .about-entity-domain { font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-top: 4px; }
 
-    .about-entity {
-      margin-top: 52px;
-      padding: 28px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-    }
-    .about-entity-label {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-    .about-entity-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .about-entity-domain {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--accent);
-      margin-top: 4px;
-    }
-
-    /* ─── CONTACT ─────────────────────────────────────────────────────── */
-    #contact {
-      padding: 120px 0;
-      border-top: 1px solid var(--border);
-    }
-    .contact-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 100px;
-      align-items: start;
-    }
-    .contact-desc {
-      margin-top: 32px;
-      color: var(--muted2);
-      font-size: 15px;
-      line-height: 1.7;
-    }
-    .contact-methods {
-      margin-top: 52px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .contact-method {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      text-decoration: none;
-      padding: 18px 22px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      transition: border-color 0.2s, background 0.2s;
-      group: true;
-    }
-    .contact-method:hover {
-      border-color: var(--border-lit);
-      background: var(--bg2);
-    }
-    .contact-method-icon {
-      width: 38px; height: 38px;
-      border-radius: 6px;
-      background: var(--bg3);
-      display: grid;
-      place-items: center;
-      flex-shrink: 0;
-    }
+    /* CONTACT */
+    #contact { padding: 120px 0; border-top: 1px solid var(--border); }
+    .contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start; }
+    .contact-desc { margin-top: 32px; color: var(--muted2); font-size: 15px; line-height: 1.7; }
+    .contact-methods { margin-top: 52px; display: flex; flex-direction: column; gap: 16px; }
+    .contact-method { display: flex; align-items: center; gap: 16px; text-decoration: none; padding: 18px 22px; border: 1px solid var(--border); border-radius: 6px; transition: border-color .2s, background .2s; }
+    .contact-method:hover { border-color: var(--border-lit); background: var(--bg2); }
+    .contact-method-icon { width: 38px; height: 38px; border-radius: 6px; background: var(--bg3); display: grid; place-items: center; flex-shrink: 0; }
     .contact-method-body { flex: 1; }
-    .contact-method-type {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .contact-method-value {
-      font-size: 14px;
-      color: var(--text);
-      font-weight: 500;
-      margin-top: 2px;
-    }
-    .contact-method-arrow { color: var(--muted); transition: transform 0.2s, color 0.2s; }
+    .contact-method-type { font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    .contact-method-value { font-size: 14px; color: var(--text); font-weight: 500; margin-top: 2px; }
+    .contact-method-arrow { color: var(--muted); transition: transform .2s, color .2s; }
     .contact-method:hover .contact-method-arrow { transform: translateX(4px); color: var(--accent); }
-
-    /* FORM */
     .contact-form { display: flex; flex-direction: column; gap: 16px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .form-group { display: flex; flex-direction: column; gap: 8px; }
-    .form-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .form-input, .form-textarea {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 13px;
-      padding: 12px 16px;
-      outline: none;
-      transition: border-color 0.2s;
-      resize: none;
-    }
+    .form-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    .form-input, .form-textarea { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-size: 13px; padding: 12px 16px; outline: none; transition: border-color .2s; resize: none; }
     .form-input:focus, .form-textarea:focus { border-color: var(--border-lit); }
     .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
     .form-textarea { min-height: 130px; }
+    .form-submit { display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: var(--bg); font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; padding: 14px 28px; border-radius: var(--radius); border: none; cursor: pointer; transition: box-shadow .3s, transform .2s; align-self: flex-start; }
+    .form-submit:hover { box-shadow: 0 0 32px rgba(200,255,87,.25); transform: translateY(-1px); }
 
-    .form-submit {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--accent);
-      color: var(--bg);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 14px 28px;
-      border-radius: var(--radius);
-      border: none;
-      cursor: pointer;
-      transition: box-shadow 0.3s, transform 0.2s;
-      align-self: flex-start;
-    }
-    .form-submit:hover {
-      box-shadow: 0 0 32px rgba(200,255,87,0.25);
-      transform: translateY(-1px);
-    }
-
-    /* ─── FOOTER ─────────────────────────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 40px 0;
-    }
-    .footer-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .footer-left {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .footer-right {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-    }
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 40px 0; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-left { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+    .footer-right { display: flex; align-items: center; gap: 32px; }
     .footer-links { display: flex; gap: 24px; }
-    .footer-links a {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
+    .footer-links a { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color .2s; }
     .footer-links a:hover { color: var(--text); }
-    .footer-domain {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--accent);
-    }
+    .footer-domain { font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
 
-    /* ─── ANIMATIONS ─────────────────────────────────────────────────── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    /* ANIMATIONS */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity .7s, transform .7s; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
 
-    .reveal {
-      opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 0.7s, transform 0.7s;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ─── MOBILE ─────────────────────────────────────────────────────── */
+    /* MOBILE */
     @media (max-width: 900px) {
-      body { cursor: auto; }
-      .cursor, .cursor-ring { display: none; }
-      .container { padding: 0 24px; }
-      .nav-inner { padding: 0 24px; }
+      body { cursor: auto; } .cursor, .cursor-ring { display: none; }
+      .container, .nav-inner { padding: 0 24px; }
       .nav-links { display: none; }
       .hero-accent-block { display: none; }
-      .services-header { grid-template-columns: 1fr; gap: 24px; }
+      .services-header, .about-grid, .contact-inner { grid-template-columns: 1fr; gap: 40px; }
       .services-grid { grid-template-columns: 1fr; }
-      .about-grid { grid-template-columns: 1fr; gap: 60px; }
       .about-left { position: static; }
-      .contact-inner { grid-template-columns: 1fr; gap: 60px; }
       .form-row { grid-template-columns: 1fr; }
       .hero-stats { grid-template-columns: 1fr 1fr; max-width: 100%; }
     }
@@ -818,11 +183,10 @@
 </head>
 <body>
 
-  <!-- Custom Cursor -->
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- ░░ NAV ░░ -->
+  <!-- NAV -->
   <nav id="nav">
     <div class="nav-inner">
       <a href="#" class="nav-logo">
@@ -838,24 +202,21 @@
     </div>
   </nav>
 
-  <!-- ░░ HERO ░░ -->
+  <!-- HERO -->
   <section id="hero">
     <div class="container">
       <div class="hero-eyebrow">
         <div class="hero-eyebrow-line"></div>
         <span class="tag">System Integration Architecture</span>
       </div>
-
       <h1 class="hero-headline">
-        We make your<br />
-        systems <em>speak</em><br />
+        We make your<br>
+        systems <em>speak</em><br>
         to each other.
       </h1>
-
       <p class="hero-sub">
-        Focal Integration Solutions helps organisations cut through complexity — designing, integrating, and architecting the technical infrastructure that keeps modern businesses moving.
+        Focal Integration Solutions helps organisations cut through complexity &mdash; designing, integrating, and architecting the technical infrastructure that keeps modern businesses moving.
       </p>
-
       <div class="hero-actions">
         <a href="#services" class="btn-primary">
           Our Services
@@ -866,7 +227,6 @@
           About Us
         </a>
       </div>
-
       <div class="hero-stats">
         <div class="hero-stat">
           <div class="stat-num">15<span>+</span></div>
@@ -882,13 +242,11 @@
         </div>
       </div>
     </div>
-
-    <!-- floating status card -->
     <div class="hero-accent-block">
       <div class="accent-card">
         <div class="accent-card-label">// Active integrations</div>
         <div class="accent-card-items">
-          <div class="aci"><div class="aci-dot"></div>ERP ↔ CRM pipeline</div>
+          <div class="aci"><div class="aci-dot"></div>ERP &harr; CRM pipeline</div>
           <div class="aci"><div class="aci-dot blue"></div>API gateway routing</div>
           <div class="aci"><div class="aci-dot"></div>Event-driven messaging</div>
           <div class="aci"><div class="aci-dot red"></div>Legacy system bridge</div>
@@ -898,34 +256,33 @@
     </div>
   </section>
 
-  <!-- ░░ MARQUEE ░░ -->
+  <!-- MARQUEE -->
   <div class="marquee-wrap">
     <div class="marquee-track">
-      <!-- items duplicated for infinite scroll -->
-      <div class="marquee-item">REST APIs <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Event-Driven Architecture <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Middleware Design <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">iPaaS Platforms <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">ERP Integration <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Cloud Architecture <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">API Strategy <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Legacy Modernisation <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Data Pipelines <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Microservices <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">REST APIs <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Event-Driven Architecture <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Middleware Design <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">iPaaS Platforms <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">ERP Integration <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Cloud Architecture <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">API Strategy <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Legacy Modernisation <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Data Pipelines <span class="marquee-sep">·</span></div>
-      <div class="marquee-item">Microservices <span class="marquee-sep">·</span></div>
+      <div class="marquee-item">REST APIs <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Event-Driven Architecture <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Middleware Design <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">iPaaS Platforms <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">ERP Integration <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Cloud Architecture <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">API Strategy <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Legacy Modernisation <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Data Pipelines <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Microservices <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">REST APIs <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Event-Driven Architecture <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Middleware Design <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">iPaaS Platforms <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">ERP Integration <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Cloud Architecture <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">API Strategy <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Legacy Modernisation <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Data Pipelines <span class="marquee-sep">&middot;</span></div>
+      <div class="marquee-item">Microservices <span class="marquee-sep">&middot;</span></div>
     </div>
   </div>
 
-  <!-- ░░ SERVICES ░░ -->
+  <!-- SERVICES -->
   <section id="services">
     <div class="container">
       <div class="services-header reveal">
@@ -934,85 +291,52 @@
             <div class="section-label-line"></div>
             <span class="section-number">01 / Services</span>
           </div>
-          <h2 class="section-heading">What we<br /><em>actually do</em></h2>
+          <h2 class="section-heading">What we<br><em>actually do</em></h2>
         </div>
-        <p class="services-sub">
-          End-to-end system integration consultancy. From architecture blueprints to hands-on delivery — we bridge the gap between your systems and your strategy.
-        </p>
+        <p class="services-sub">End-to-end system integration consultancy. From architecture blueprints to hands-on delivery &mdash; we bridge the gap between your systems and your strategy.</p>
       </div>
-
       <div class="services-grid reveal">
-        <div class="service-card" onmousemove="cardGlow(this, event)">
+        <div class="service-card" onmousemove="cardGlow(this,event)">
           <div class="service-num">01</div>
           <div class="service-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M3 6h14M3 10h14M3 14h14M7 3v14M13 3v14" stroke-linecap="round"/>
-            </svg>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h14M3 10h14M3 14h14M7 3v14M13 3v14" stroke-linecap="round"/></svg>
           </div>
           <h3 class="service-title">Integration Architecture</h3>
           <p class="service-desc">Design of robust, scalable integration frameworks that align with your existing infrastructure and long-term technology roadmap.</p>
-          <div class="service-tags">
-            <span class="service-tag">Blueprint Design</span>
-            <span class="service-tag">Pattern Selection</span>
-            <span class="service-tag">Roadmapping</span>
-          </div>
+          <div class="service-tags"><span class="service-tag">Blueprint Design</span><span class="service-tag">Pattern Selection</span><span class="service-tag">Roadmapping</span></div>
         </div>
-
-        <div class="service-card" onmousemove="cardGlow(this, event)">
+        <div class="service-card" onmousemove="cardGlow(this,event)">
           <div class="service-num">02</div>
           <div class="service-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="5" cy="10" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="15" cy="15" r="2.5"/>
-              <path d="M7.5 10h5M7.5 9l5-3.5M7.5 11l5 3.5" stroke-linecap="round"/>
-            </svg>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="10" r="2.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="15" cy="15" r="2.5"/><path d="M7.5 10h5M7.5 9l5-3.5M7.5 11l5 3.5" stroke-linecap="round"/></svg>
           </div>
-          <h3 class="service-title">API Design & Strategy</h3>
-          <p class="service-desc">End-to-end API lifecycle management — from design standards and governance frameworks to developer portals and security policies.</p>
-          <div class="service-tags">
-            <span class="service-tag">RESTful APIs</span>
-            <span class="service-tag">AsyncAPI</span>
-            <span class="service-tag">GraphQL</span>
-          </div>
+          <h3 class="service-title">API Design &amp; Strategy</h3>
+          <p class="service-desc">End-to-end API lifecycle management &mdash; from design standards and governance frameworks to developer portals and security policies.</p>
+          <div class="service-tags"><span class="service-tag">RESTful APIs</span><span class="service-tag">AsyncAPI</span><span class="service-tag">GraphQL</span></div>
         </div>
-
-        <div class="service-card" onmousemove="cardGlow(this, event)">
+        <div class="service-card" onmousemove="cardGlow(this,event)">
           <div class="service-num">03</div>
           <div class="service-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/>
-              <rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/>
-            </svg>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
           </div>
-          <h3 class="service-title">iPaaS & Middleware</h3>
-          <p class="service-desc">Vendor-neutral guidance and hands-on implementation across leading integration platforms — MuleSoft, Boomi, Azure Integration Services, and more.</p>
-          <div class="service-tags">
-            <span class="service-tag">MuleSoft</span>
-            <span class="service-tag">Azure</span>
-            <span class="service-tag">Boomi</span>
-          </div>
+          <h3 class="service-title">iPaaS &amp; Middleware</h3>
+          <p class="service-desc">Vendor-neutral guidance and hands-on implementation across leading integration platforms &mdash; MuleSoft, Boomi, Azure Integration Services, and more.</p>
+          <div class="service-tags"><span class="service-tag">MuleSoft</span><span class="service-tag">Azure</span><span class="service-tag">Boomi</span></div>
         </div>
-
-        <div class="service-card" onmousemove="cardGlow(this, event)">
+        <div class="service-card" onmousemove="cardGlow(this,event)">
           <div class="service-num">04</div>
           <div class="service-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M10 3C6.134 3 3 6.134 3 10s3.134 7 7 7 7-3.134 7-7" stroke-linecap="round"/>
-              <path d="M14 3l3 3-3 3M17 6H13" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3C6.134 3 3 6.134 3 10s3.134 7 7 7 7-3.134 7-7" stroke-linecap="round"/><path d="M14 3l3 3-3 3M17 6H13" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <h3 class="service-title">Legacy Modernisation</h3>
-          <p class="service-desc">Pragmatic strategies for integrating or migrating legacy systems — minimising disruption while building a foundation for future agility.</p>
-          <div class="service-tags">
-            <span class="service-tag">Assessment</span>
-            <span class="service-tag">Strangler Fig</span>
-            <span class="service-tag">Migration</span>
-          </div>
+          <p class="service-desc">Pragmatic strategies for integrating or migrating legacy systems &mdash; minimising disruption while building a foundation for future agility.</p>
+          <div class="service-tags"><span class="service-tag">Assessment</span><span class="service-tag">Strangler Fig</span><span class="service-tag">Migration</span></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ░░ ABOUT ░░ -->
+  <!-- ABOUT -->
   <section id="about">
     <div class="container">
       <div class="about-grid">
@@ -1021,70 +345,51 @@
             <div class="section-label-line"></div>
             <span class="section-number">02 / About</span>
           </div>
-          <h2 class="section-heading">Built on<br /><em>experience</em></h2>
-          <p class="about-desc">
-            Flints.tech is the consultancy arm of Focal Integration Solutions Ltd — an independent advisory practice focused exclusively on systems integration architecture.
-          </p>
-          <p class="about-desc">
-            We work with businesses of all sizes to untangle complex system landscapes, establish clear integration patterns, and deliver practical, vendor-agnostic guidance that sticks.
-          </p>
-          <p class="about-desc">
-            No fluff. No bloated project teams. Just deep expertise applied to your exact problem.
-          </p>
-
+          <h2 class="section-heading">Built on<br><em>experience</em></h2>
+          <p class="about-desc">Flints.tech is the consultancy arm of Focal Integration Solutions Ltd &mdash; an independent advisory practice focused exclusively on systems integration architecture.</p>
+          <p class="about-desc">We work with businesses of all sizes to untangle complex system landscapes, establish clear integration patterns, and deliver practical, vendor-agnostic guidance that sticks.</p>
+          <p class="about-desc">No fluff. No bloated project teams. Just deep expertise applied to your exact problem.</p>
           <div class="about-entity">
             <div class="about-entity-label">Registered Entity</div>
             <div class="about-entity-name">Focal Integration Solutions Ltd</div>
             <div class="about-entity-domain">flints.tech</div>
           </div>
         </div>
-
         <div class="about-right reveal">
           <div class="about-feature">
             <div class="about-feature-header">
               <div class="about-feature-title">Vendor-Agnostic</div>
-              <div class="about-feature-icon">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#c8ff57" stroke-width="1.5"><path d="M7 1l1.5 4.5H14l-4 2.5 1.5 4.5L7 10 1.5 12.5 3 8 -1 5.5h5.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
+              <div class="about-feature-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#c8ff57" stroke-width="1.5"><path d="M7 1l1.5 4.5H14l-4 2.5 1.5 4.5L7 10 1.5 12.5 3 8-1 5.5h5.5z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
-            <p class="about-feature-desc">We recommend what's right for your context — not what's easiest to sell. Platform selection is always driven by your requirements.</p>
+            <p class="about-feature-desc">We recommend what's right for your context &mdash; not what's easiest to sell. Platform selection is always driven by your requirements.</p>
           </div>
-
           <div class="about-feature">
             <div class="about-feature-header">
               <div class="about-feature-title">Architecture-First</div>
-              <div class="about-feature-icon">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#c8ff57" stroke-width="1.5"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>
-              </div>
+              <div class="about-feature-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#c8ff57" stroke-width="1.5"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg></div>
             </div>
             <p class="about-feature-desc">Every engagement starts with a clear architectural view. We design systems that are maintainable, observable, and built to grow.</p>
           </div>
-
           <div class="about-feature">
             <div class="about-feature-header">
               <div class="about-feature-title">Embedded Delivery</div>
-              <div class="about-feature-icon">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#c8ff57" stroke-width="1.5"><circle cx="7" cy="4" r="2.5"/><path d="M1 13c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke-linecap="round"/></svg>
-              </div>
+              <div class="about-feature-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#c8ff57" stroke-width="1.5"><circle cx="7" cy="4" r="2.5"/><path d="M1 13c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke-linecap="round"/></svg></div>
             </div>
             <p class="about-feature-desc">We work alongside your team, not around them. Knowledge transfer is built into every engagement so your people are left stronger.</p>
           </div>
-
           <div class="about-feature">
             <div class="about-feature-header">
-              <div class="about-feature-title">Pragmatic & Direct</div>
-              <div class="about-feature-icon">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#c8ff57" stroke-width="1.5"><path d="M1 7h12M8 2l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
+              <div class="about-feature-title">Pragmatic &amp; Direct</div>
+              <div class="about-feature-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#c8ff57" stroke-width="1.5"><path d="M1 7h12M8 2l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
-            <p class="about-feature-desc">Clear communication, honest assessments, and no unnecessary complexity. We give you the picture as it is — then help you fix it.</p>
+            <p class="about-feature-desc">Clear communication, honest assessments, and no unnecessary complexity. We give you the picture as it is &mdash; then help you fix it.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ░░ CONTACT ░░ -->
+  <!-- CONTACT -->
   <section id="contact">
     <div class="container">
       <div class="contact-inner">
@@ -1093,43 +398,24 @@
             <div class="section-label-line"></div>
             <span class="section-number">03 / Contact</span>
           </div>
-          <h2 class="section-heading">Let's talk<br /><em>integration</em></h2>
-          <p class="contact-desc">
-            Whether you're scoping a new programme, stuck with a legacy problem, or just need a second opinion on your integration architecture — we'd like to hear from you.
-          </p>
-
+          <h2 class="section-heading">Let's talk<br><em>integration</em></h2>
+          <p class="contact-desc">Whether you're scoping a new programme, stuck with a legacy problem, or just need a second opinion on your integration architecture &mdash; we'd like to hear from you.</p>
           <div class="contact-methods">
-            <a href="/cdn-cgi/l/email-protection#bbd3ded7d7d4fbddd7d2d5cfc895cfded8d3" class="contact-method">
+
+            <a href="mailto:anton@flints.tech" class="contact-method">
               <div class="contact-method-icon">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c8ff57" stroke-width="1.3">
-                  <rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 5l7 5 7-5"/>
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c8ff57" stroke-width="1.3"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 5l7 5 7-5"/></svg>
               </div>
               <div class="contact-method-body">
                 <div class="contact-method-type">Email</div>
-                <div class="contact-method-value"><span class="__cf_email__" data-cfemail="0a626f6666654a6c6663647e79247e6f6962">[email&#160;protected]</span></div>
+                <div class="contact-method-value">anton@flints.tech</div>
               </div>
               <svg class="contact-method-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <a href="https://www.linkedin.com/in/antonpushparajah/" target="_blank" class="contact-method">
-              <div class="contact-method-icon">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c8ff57" stroke-width="1.3">
-                  <rect x="1" y="1" width="14" height="14" rx="2"/>
-                  <path d="M4 7v5M4 4.5v.5" stroke-linecap="round"/>
-                  <path d="M7 12V9c0-1.1.9-2 2-2s2 .9 2 2v3M7 7v5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <div class="contact-method-body">
-                <div class="contact-method-type">LinkedIn</div>
-                <div class="contact-method-value">Anton Pushparajah</div>
-              </div>
-              <svg class="contact-method-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
+
             <a href="tel:+447837921540" class="contact-method">
               <div class="contact-method-icon">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c8ff57" stroke-width="1.3">
-                  <path d="M3 2h3l1.5 3.5-2 1.2a9 9 0 004.8 4.8l1.2-2L15 11v3a1 1 0 01-1 1C6.3 15 1 9.7 1 3a1 1 0 011-1z" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c8ff57" stroke-width="1.3"><path d="M3 2h3l1.5 3.5-2 1.2a9 9 0 004.8 4.8l1.2-2L15 11v3a1 1 0 01-1 1C6.3 15 1 9.7 1 3a1 1 0 011-1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
               <div class="contact-method-body">
                 <div class="contact-method-type">Mobile</div>
@@ -1137,6 +423,18 @@
               </div>
               <svg class="contact-method-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
+
+            <a href="https://www.linkedin.com/in/antonpushparajah/" target="_blank" class="contact-method">
+              <div class="contact-method-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c8ff57" stroke-width="1.3"><rect x="1" y="1" width="14" height="14" rx="2"/><path d="M4 7v5M4 4.5v.5" stroke-linecap="round"/><path d="M7 12V9c0-1.1.9-2 2-2s2 .9 2 2v3M7 7v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="contact-method-body">
+                <div class="contact-method-type">LinkedIn</div>
+                <div class="contact-method-value">Anton Pushparajah</div>
+              </div>
+              <svg class="contact-method-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+
           </div>
         </div>
 
@@ -1157,7 +455,7 @@
           </div>
           <div class="form-group">
             <label class="form-label" for="message">Message</label>
-            <textarea class="form-textarea" id="message" placeholder="Tell us about your integration challenge…" required></textarea>
+            <textarea class="form-textarea" id="message" placeholder="Tell us about your integration challenge..." required></textarea>
           </div>
           <button type="submit" class="form-submit" id="submitBtn">
             Send Message
@@ -1168,13 +466,11 @@
     </div>
   </section>
 
-  <!-- ░░ FOOTER ░░ -->
+  <!-- FOOTER -->
   <footer>
     <div class="container">
       <div class="footer-inner">
-        <div class="footer-left">
-          © 2025 Focal Integration Solutions Ltd · All rights reserved
-        </div>
+        <div class="footer-left">&copy; 2025 Focal Integration Solutions Ltd &middot; All rights reserved</div>
         <div class="footer-right">
           <div class="footer-links">
             <a href="#services">Services</a>
@@ -1187,57 +483,59 @@
     </div>
   </footer>
 
-  <!-- ░░ SCRIPTS ░░ -->
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     // Cursor
     const cursor = document.getElementById('cursor');
-    const ring   = document.getElementById('cursorRing');
+    const ring = document.getElementById('cursorRing');
     let mx = 0, my = 0, rx = 0, ry = 0;
-
-    document.addEventListener('mousemove', e => {
+    document.addEventListener('mousemove', function(e) {
       mx = e.clientX; my = e.clientY;
       cursor.style.left = mx + 'px';
-      cursor.style.top  = my + 'px';
+      cursor.style.top = my + 'px';
     });
-
     function lerp(a, b, t) { return a + (b - a) * t; }
-    function animateCursor() {
+    (function tick() {
       rx = lerp(rx, mx, 0.12);
       ry = lerp(ry, my, 0.12);
       ring.style.left = rx + 'px';
-      ring.style.top  = ry + 'px';
-      requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(tick);
+    })();
 
-    // Nav scroll state
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 40);
+    // Nav
+    window.addEventListener('scroll', function() {
+      document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
     });
 
-    // Scroll reveal
-    const reveals = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver(entries => {
-      entries.forEach((e, i) => {
+    // Reveal
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e, i) {
         if (e.isIntersecting) {
-          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          setTimeout(function() { e.target.classList.add('visible'); }, i * 80);
           io.unobserve(e.target);
         }
       });
     }, { threshold: 0.12 });
-    reveals.forEach(el => io.observe(el));
+    document.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
 
-    // Card glow on hover
+    // Card glow
     function cardGlow(el, e) {
-      const r = el.getBoundingClientRect();
+      var r = el.getBoundingClientRect();
       el.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
-      el.style.setProperty('--my', ((e.clientY - r.top)  / r.height * 100) + '%');
+      el.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
     }
 
     // Form
     function handleSubmit(e) {
       e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      btn.textContent = '✓ Sent — we\'ll be in touch';
-      b
+      var btn = document.getElementById('submitBtn');
+      btn.textContent = 'Sent — we\'ll be in touch';
+      btn.style.background = 'rgba(200,255,87,0.1)';
+      btn.style.color = '#c8ff57';
+      btn.style.border = '1px solid rgba(200,255,87,0.3)';
+      btn.style.boxShadow = 'none';
+      btn.disabled = true;
+    }
+  </script>
+</body>
+</html>
